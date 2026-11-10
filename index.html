@@ -57,6 +57,7 @@ tr.mine td{background:color-mix(in srgb,var(--blue) 8%,transparent)}
 tr.next td{color:var(--muted);font-style:italic}
 .pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--soft);color:var(--muted)}
 .empty{padding:40px 20px;text-align:center;color:var(--muted)}
+.btn.pdf{padding:5px 12px;min-height:30px;font-size:12px;font-weight:600;color:var(--blue);white-space:nowrap}
 @media (max-width:700px){.hide-sm{display:none}}
 </style>
 </head>
@@ -95,6 +96,21 @@ tr.next td{color:var(--muted);font-style:italic}
     if (!r.ok) throw new Error(j.error || ('Kļūda ' + r.status));
     return j;
   }
+  async function download(nr, btn){
+    const old = btn.textContent; btn.disabled = true; btn.textContent = 'Lādē…';
+    try {
+      const j = await call('pdf', {numurs: nr});
+      const bin = atob(j.b64); const u8 = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([u8], {type:'application/pdf'}));
+      const a = h('a',{href:url, download: j.nosaukums || (nr + '.pdf')}); document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+    } catch (e) { msg(e.message, 'bad'); }
+    finally { btn.disabled = false; btn.textContent = old; }
+  }
+  const pdfBtn = (nr, has) => has
+    ? h('button',{class:'btn pdf', type:'button', title:'Lejupielādēt PDF', 'aria-label':'Lejupielādēt PDF ' + nr, onclick: (e) => download(nr, e.currentTarget)}, 'PDF ↓')
+    : h('span',{class:'pill', title:'PDF vēl nav augšupielādēts'}, 'PDF drīzumā');
   function msg(text, cls){ const b = $('msg'); b.replaceChildren(); if (text) b.append(h('div',{class:'note ' + (cls || '')}, text)); }
   async function load(m){
     try { D = await call('dati', {menesis: m}); M = D.menesis; edits = {}; render(); }
@@ -111,7 +127,7 @@ tr.next td{color:var(--muted);font-style:italic}
       sendBtn.disabled = true;
       try { await call('sutit', {menesis: M}); msg('Paldies! Pavadzīmes iesniegtas. Tās tiks izdotas mēneša pēdējā nedēļā un nosūtītas jums e-pastā.', 'ok'); await load(M); }
       catch (e) { msg(e.message, 'bad'); sendBtn.disabled = false; } }}, 'Sūtīt');
-    app.append(h('div',{class:'bar'}, h('div',{class:'sub', style:'margin:0'}, fmtMon(M)), h('span',{class:'sp'}),
+    if (ps.length) app.append(h('div',{class:'bar'}, h('div',{class:'sub', style:'margin:0'}, fmtMon(M)), h('span',{class:'sp'}),
       anyDraft ? null : h('span',{class:'sub', style:'margin:0'}, 'Iesniegts. Labojumus var veikt arī tagad — tie tiks ņemti vērā.'), sendBtn));
     const grid = h('div',{class:'grid'});
     ps.forEach(P => {
@@ -131,7 +147,8 @@ tr.next td{color:var(--muted);font-style:italic}
         catch (e) { msg(e.message, 'bad'); save.disabled = false; } }}, 'Saglabāt');
       grid.append(h('div',{class:'card'},
         h('div',{class:'h'}, h('div',null, h('div',{class:'t'}, P.nosaukums), h('div',{class:'n'}, P.numurs ? 'Nr. ' + P.numurs + (P.japaregenere ? ' · labots, tiks izdots no jauna' : '') : 'Numurs tiks piešķirts izdodot')),
-          h('span',{class:'st ' + P.statuss}, ST[P.statuss] || P.statuss)),
+          h('div',{style:'display:flex;gap:8px;align-items:center'}, P.numurs && ['izdots','nosutits'].includes(P.statuss) && !P.japaregenere ? pdfBtn(P.numurs, P.pdf) : null,
+            h('span',{class:'st ' + P.statuss}, ST[P.statuss] || P.statuss))),
         h('div',{class:'tbl'}, h('table',null, h('thead',null, h('tr',null, h('th',null,'Apraksts'), h('th',{class:'num'},'Daudz.'), h('th',null,''), h('th',{class:'num'},'Cena'), h('th',null,''))), tb)),
         h('div',{class:'foot'}, 'Bez PVN ', totEl, ' · ar PVN ', pvnEl, h('span',{class:'sp'}), dirty,
           h('button',{class:'btn', type:'button', onclick: () => { R.push({apraksts:'', daudzums:'1', mervieniba:'gab', cena:0}); edits[P.kods] = R; render(); }}, '+ Rinda'), save)));
@@ -146,11 +163,13 @@ tr.next td{color:var(--muted);font-style:italic}
       h('td',null, h('b',null, r.numurs)), h('td',{class:'hide-sm'}, fmtDate(r.datums)),
       h('td',null, r.klients, h('div',{class:'sub', style:'margin:0'}, r.saturs || '')),
       h('td',{class:'num'}, fmtEUR(r.summa_bez_pvn)), h('td',{class:'num'}, fmtEUR(r.kopa)),
-      h('td',{class:'hide-sm'}, r.avots === 'banka' ? h('span',{class:'pill'}, 'pēc bankas') : r.avots === 'MASTER2026' ? h('span',{class:'pill'}, 'vecā tabula') : null)));
+      h('td',{class:'hide-sm'}, r.avots === 'banka' ? h('span',{class:'pill'}, 'pēc bankas') : r.avots === 'MASTER2026' ? h('span',{class:'pill'}, 'vecā tabula') : null),
+      h('td',{class:'num'}, pdfBtn(r.numurs, r.pdf))));
     pend.forEach((p, i) => rows.push(h('tr',{class:'next'}, h('td',null, yy.slice(2) + mm + '-' + (maxNr + i + 1) + '?'), h('td',{class:'hide-sm'}, ''),
-      h('td',null, p.nosaukums, h('div',{class:'sub', style:'margin:0'}, 'paredzētais numurs')), h('td',{class:'num'}, fmtEUR(sum(p.rindas))), h('td',{class:'num'}, fmtEUR(r2(sum(p.rindas) * 1.21))), h('td',{class:'hide-sm'}, ''))));
-    app.append(h('h2',null, 'Mēneša numuru secība'), h('div',{class:'sub'}, 'Visas KiiK pavadzīmes šajā mēnesī. Jūsu pavadzīmes iekrāsotas.'),
-      h('div',{class:'panel'}, h('div',{class:'tbl'}, rows.length ? h('table',null, h('thead',null, h('tr',null, h('th',null,'Nr.'), h('th',{class:'hide-sm'},'Datums'), h('th',null,'Klients'), h('th',{class:'num'},'Bez PVN'), h('th',{class:'num'},'Ar PVN'), h('th',{class:'hide-sm'},''))), h('tbody',null, rows)) : h('div',{class:'empty'}, 'Šajā mēnesī vēl nav izdotu pavadzīmju.'))));
+      h('td',null, p.nosaukums, h('div',{class:'sub', style:'margin:0'}, 'paredzētais numurs')), h('td',{class:'num'}, fmtEUR(sum(p.rindas))), h('td',{class:'num'}, fmtEUR(r2(sum(p.rindas) * 1.21))), h('td',{class:'hide-sm'}, ''), h('td',null, ''))));
+    const nPdf = reg.filter(r => r.pdf).length;
+    app.append(h('h2',null, 'Visas pavadzīmes — ' + fmtMon(M)), h('div',{class:'sub'}, 'Visas KiiK pavadzīmes šajā mēnesī, numuru secībā. Jūsu pavadzīmes iekrāsotas. PDF lejupielādei: ' + nPdf + ' no ' + reg.length + '.'),
+      h('div',{class:'panel'}, h('div',{class:'tbl'}, rows.length ? h('table',null, h('thead',null, h('tr',null, h('th',null,'Nr.'), h('th',{class:'hide-sm'},'Datums'), h('th',null,'Klients'), h('th',{class:'num'},'Bez PVN'), h('th',{class:'num'},'Ar PVN'), h('th',{class:'hide-sm'},''), h('th',{class:'num'},'PDF'))), h('tbody',null, rows)) : h('div',{class:'empty'}, 'Šajā mēnesī vēl nav izdotu pavadzīmju.'))));
   }
   if (!key) { $('app').replaceChildren(h('div',{class:'empty'}, 'Nederīga saite.')); return; }
   load('');
