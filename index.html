@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="lv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>KiiK — pavadzīmes</title>
+<style>
+:root{--bg:#F5F5F7;--panel:#fff;--fg:#1D1D1F;--muted:#6E6E73;--line:#E5E5EA;--soft:#F2F2F7;--blue:#0071E3;--ok:#248A3D;--warn:#B25000;--bad:#D70015;--shadow:0 1px 2px rgba(0,0,0,.04),0 4px 12px rgba(0,0,0,.04)}
+@media (prefers-color-scheme:dark){:root{--bg:#000;--panel:#1C1C1E;--fg:#F5F5F7;--muted:#98989D;--line:#38383A;--soft:#2C2C2E;--blue:#0A84FF;--ok:#32D74B;--warn:#FF9F0A;--bad:#FF6961;--shadow:none}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Inter,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:1200px;margin:0 auto;padding:32px 40px 64px}
+@media (max-width:700px){.wrap{padding:20px 16px 48px}}
+h1{margin:4px 0 0;font-size:32px;font-weight:700;letter-spacing:-.02em}
+.sub{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;min-height:32px;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--panel);border-color:var(--fg);font-weight:600}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:24px 0 14px}
+.bar .sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 16px;min-height:36px;font-size:14px;cursor:pointer}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+.btn:disabled{opacity:.45;cursor:default}
+.note{padding:12px 16px;border-radius:12px;background:var(--soft);font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+.note.ok{color:var(--ok)} .note.bad{color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.card .h{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;padding:14px 16px 6px}
+.card .t{font-size:15px;font-weight:600}
+.card .n{font-size:12px;color:var(--muted);margin-top:2px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;font-weight:500;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.card td:first-child{min-width:220px;width:60%}
+.card input{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--panel);font-size:13px}
+.card input.n{text-align:right;width:76px;font-variant-numeric:tabular-nums}
+.card input:disabled{border-color:transparent;background:transparent}
+.mini{border:0;background:transparent;color:var(--muted);font-size:17px;width:30px;height:30px;border-radius:15px;cursor:pointer}
+.foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px 14px;border-top:1px solid var(--line);font-size:13px}
+.foot .sp{flex:1}
+.dirty{font-size:12px;color:var(--warn)}
+.st{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--soft);color:var(--muted)}
+.st.iesniegts{background:color-mix(in srgb,#FF9F0A 18%,transparent);color:var(--warn)}
+.st.izdots,.st.nosutits{background:color-mix(in srgb,#34C759 18%,transparent);color:var(--ok)}
+h2{font-size:18px;margin:32px 0 4px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-top:12px}
+tr.mine td{background:color-mix(in srgb,var(--blue) 8%,transparent)}
+tr.next td{color:var(--muted);font-style:italic}
+.pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--soft);color:var(--muted)}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+@media (max-width:700px){.hide-sm{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><div class="sub">SIA KiiK</div><h1>Pavadzīmes — noma un apkalpošana</h1>
+      <div class="sub">Labojiet daudzumus vai cenas, saglabājiet un nospiediet „Sūtīt”. Pavadzīmes tiks izdotas mēneša pēdējā nedēļā un nosūtītas uz jūsu e-pastu.</div></div>
+    <div class="chips" id="mon"></div>
+  </div>
+  <div id="msg"></div>
+  <div id="app"><div class="empty">Ielādē…</div></div>
+</div>
+<script>
+(() => {
+  const API = 'https://bawgnvauzrvyhajuyika.supabase.co/functions/v1/vita-api';
+  const key = new URLSearchParams(location.hash.slice(1)).get('k') || '';
+  const $ = (id) => document.getElementById(id);
+  function h(tag, attrs, ...kids){ const e = document.createElement(tag);
+    if (attrs) for (const k in attrs){ const v = attrs[k]; if (v == null || v === false) continue;
+      if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); }
+    for (const c of kids.flat()) { if (c == null || c === false) continue; e.append(c instanceof Node ? c : document.createTextNode(String(c))); }
+    return e; }
+  const fmtEUR = (n) => new Intl.NumberFormat('lv',{style:'currency',currency:'EUR'}).format(Number(n) || 0);
+  const fmtMon = (m) => { const [y, mo] = m.split('-').map(Number); const s = new Intl.DateTimeFormat('lv',{month:'long', year:'numeric'}).format(new Date(Date.UTC(y, mo - 1, 15))); return s.charAt(0).toUpperCase() + s.slice(1); };
+  const fmtDate = (d) => d ? new Intl.DateTimeFormat('lv',{day:'numeric', month:'short'}).format(new Date(d)) : '';
+  const qty = (t) => { t = String(t ?? '').trim(); const m = t.match(/^(\d+):(\d{1,2})/); if (m) return Number(m[1]) + Number(m[2]) / 60; const v = Number(t.replace(',', '.')); return isFinite(v) ? v : 0; };
+  const r2 = (n) => Math.round(n * 100) / 100;
+  const sum = (R) => r2(R.reduce((a, x) => a + r2(qty(x.daudzums) * (Number(x.cena) || 0)), 0));
+  const ST = {melnraksts:'Melnraksts', iesniegts:'Iesniegts — tiks izdots', izdots:'Izdots', nosutits:'Nosūtīts'};
+  let D = null, M = null, edits = {};
+
+  async function call(action, extra){
+    const r = await fetch(API, {method:'POST', headers:{'content-type':'application/json','x-vita-key':key}, body: JSON.stringify({action, ...extra})});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || ('Kļūda ' + r.status));
+    return j;
+  }
+  function msg(text, cls){ const b = $('msg'); b.replaceChildren(); if (text) b.append(h('div',{class:'note ' + (cls || '')}, text)); }
+  async function load(m){
+    try { D = await call('dati', {menesis: m}); M = D.menesis; edits = {}; render(); }
+    catch (e) { $('app').replaceChildren(h('div',{class:'empty'}, e.message)); }
+  }
+  function render(){
+    const mon = $('mon'); mon.replaceChildren();
+    (D.menesi || []).forEach(m => mon.append(h('button',{class:'chip', type:'button', 'aria-pressed': m === M ? 'true' : 'false', onclick: () => { msg(''); load(m); }}, fmtMon(m))));
+    const app = $('app'); app.replaceChildren();
+    const ps = D.pavadzimes || [];
+    const anyDraft = ps.some(p => p.statuss === 'melnraksts');
+    const sendBtn = h('button',{class:'btn primary', type:'button', disabled: !anyDraft, onclick: async () => {
+      if (Object.keys(edits).length) { msg('Vispirms saglabājiet labojumus.', 'bad'); return; }
+      sendBtn.disabled = true;
+      try { await call('sutit', {menesis: M}); msg('Paldies! Pavadzīmes iesniegtas. Tās tiks izdotas mēneša pēdējā nedēļā un nosūtītas jums e-pastā.', 'ok'); await load(M); }
+      catch (e) { msg(e.message, 'bad'); sendBtn.disabled = false; } }}, 'Sūtīt');
+    app.append(h('div',{class:'bar'}, h('div',{class:'sub', style:'margin:0'}, fmtMon(M)), h('span',{class:'sp'}),
+      anyDraft ? null : h('span',{class:'sub', style:'margin:0'}, 'Iesniegts. Labojumus var veikt arī tagad — tie tiks ņemti vērā.'), sendBtn));
+    const grid = h('div',{class:'grid'});
+    ps.forEach(P => {
+      const R = edits[P.kods] || JSON.parse(JSON.stringify(P.rindas || []));
+      const totEl = h('b',null, fmtEUR(sum(R))), pvnEl = h('span',null, fmtEUR(r2(sum(R) * 1.21)));
+      const dirty = h('span',{class:'dirty', hidden: !edits[P.kods]}, 'Nesaglabāts');
+      const touch = () => { edits[P.kods] = R; dirty.hidden = false; totEl.textContent = fmtEUR(sum(R)); pvnEl.textContent = fmtEUR(r2(sum(R) * 1.21)); };
+      const tb = h('tbody',null, R.map((x, i) => h('tr',null,
+        h('td',null, h('input',{value: x.apraksts || '', 'aria-label':'Apraksts', oninput: (e) => { x.apraksts = e.target.value; touch(); }})),
+        h('td',{class:'num'}, h('input',{class:'n', value: x.daudzums ?? '', inputmode:'decimal', 'aria-label':'Daudzums', oninput: (e) => { x.daudzums = e.target.value; touch(); }})),
+        h('td',{style:'color:var(--muted);font-size:12px'}, x.mervieniba || ''),
+        h('td',{class:'num'}, h('input',{class:'n', type:'number', step:'0.01', min:'0', value: x.cena ?? '', 'aria-label':'Cena', oninput: (e) => { x.cena = Number(e.target.value) || 0; touch(); }})),
+        h('td',null, h('button',{class:'mini', type:'button', title:'Dzēst rindu', 'aria-label':'Dzēst rindu', onclick: () => { R.splice(i, 1); edits[P.kods] = R; render(); }}, '×')))));
+      const save = h('button',{class:'btn', type:'button', onclick: async () => {
+        save.disabled = true;
+        try { await call('saglabat', {menesis: M, kods: P.kods, rindas: R}); delete edits[P.kods]; msg('Saglabāts.', 'ok'); await load(M); }
+        catch (e) { msg(e.message, 'bad'); save.disabled = false; } }}, 'Saglabāt');
+      grid.append(h('div',{class:'card'},
+        h('div',{class:'h'}, h('div',null, h('div',{class:'t'}, P.nosaukums), h('div',{class:'n'}, P.numurs ? 'Nr. ' + P.numurs + (P.japaregenere ? ' · labots, tiks izdots no jauna' : '') : 'Numurs tiks piešķirts izdodot')),
+          h('span',{class:'st ' + P.statuss}, ST[P.statuss] || P.statuss)),
+        h('div',{class:'tbl'}, h('table',null, h('thead',null, h('tr',null, h('th',null,'Apraksts'), h('th',{class:'num'},'Daudz.'), h('th',null,''), h('th',{class:'num'},'Cena'), h('th',null,''))), tb)),
+        h('div',{class:'foot'}, 'Bez PVN ', totEl, ' · ar PVN ', pvnEl, h('span',{class:'sp'}), dirty,
+          h('button',{class:'btn', type:'button', onclick: () => { R.push({apraksts:'', daudzums:'1', mervieniba:'gab', cena:0}); edits[P.kods] = R; render(); }}, '+ Rinda'), save)));
+    });
+    app.append(grid);
+    const reg = D.registrs || [];
+    const done = new Set(reg.map(r => r.numurs));
+    const pend = ps.filter(p => !p.numurs || !done.has(p.numurs));
+    const maxNr = reg.reduce((a, r) => Math.max(a, Number(r.nr) || 0), 0);
+    const [yy, mm] = M.split('-');
+    const rows = reg.map(r => h('tr',{class: /^Vitas/.test(r.saturs || '') ? 'mine' : null},
+      h('td',null, h('b',null, r.numurs)), h('td',{class:'hide-sm'}, fmtDate(r.datums)),
+      h('td',null, r.klients, h('div',{class:'sub', style:'margin:0'}, r.saturs || '')),
+      h('td',{class:'num'}, fmtEUR(r.summa_bez_pvn)), h('td',{class:'num'}, fmtEUR(r.kopa)),
+      h('td',{class:'hide-sm'}, r.avots === 'banka' ? h('span',{class:'pill'}, 'pēc bankas') : r.avots === 'MASTER2026' ? h('span',{class:'pill'}, 'vecā tabula') : null)));
+    pend.forEach((p, i) => rows.push(h('tr',{class:'next'}, h('td',null, yy.slice(2) + mm + '-' + (maxNr + i + 1) + '?'), h('td',{class:'hide-sm'}, ''),
+      h('td',null, p.nosaukums, h('div',{class:'sub', style:'margin:0'}, 'paredzētais numurs')), h('td',{class:'num'}, fmtEUR(sum(p.rindas))), h('td',{class:'num'}, fmtEUR(r2(sum(p.rindas) * 1.21))), h('td',{class:'hide-sm'}, ''))));
+    app.append(h('h2',null, 'Mēneša numuru secība'), h('div',{class:'sub'}, 'Visas KiiK pavadzīmes šajā mēnesī. Jūsu pavadzīmes iekrāsotas.'),
+      h('div',{class:'panel'}, h('div',{class:'tbl'}, rows.length ? h('table',null, h('thead',null, h('tr',null, h('th',null,'Nr.'), h('th',{class:'hide-sm'},'Datums'), h('th',null,'Klients'), h('th',{class:'num'},'Bez PVN'), h('th',{class:'num'},'Ar PVN'), h('th',{class:'hide-sm'},''))), h('tbody',null, rows)) : h('div',{class:'empty'}, 'Šajā mēnesī vēl nav izdotu pavadzīmju.'))));
+  }
+  if (!key) { $('app').replaceChildren(h('div',{class:'empty'}, 'Nederīga saite.')); return; }
+  load('');
+})();
+</script>
+</body>
+</html>
